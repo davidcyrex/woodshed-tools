@@ -53,6 +53,10 @@ export class Metronome {
     Tone.getTransport().swing = this.config.swing
   }
 
+  setBeatsPerBar(beats: number): void {
+    this.config.beatsPerBar = beats
+  }
+
   setAccentBeats(beats: number[]): void {
     this.config.accentBeats = beats
   }

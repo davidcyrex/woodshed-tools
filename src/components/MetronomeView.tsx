@@ -15,6 +15,26 @@ const TEMPO_PRESETS: { bpm: number; label: string }[] = [
   { bpm: 180, label: 'Presto' },
 ]
 
+type Meter = 'binary' | 'ternary'
+
+const METERS: { id: Meter; label: string; beats: number }[] = [
+  { id: 'binary', label: '4/4', beats: 4 },
+  { id: 'ternary', label: '3/4', beats: 3 },
+]
+
+// Accent patterns offered for each meter.
+const ACCENTS: Record<Meter, { id: string; label: string; beats: number[] }[]> = {
+  binary: [
+    { id: '1', label: '1', beats: [1] },
+    { id: '13', label: '1 & 3', beats: [1, 3] },
+    { id: '24', label: '2 & 4', beats: [2, 4] },
+  ],
+  ternary: [
+    { id: '1', label: '1', beats: [1] },
+    { id: '23', label: '2 & 3', beats: [2, 3] },
+  ],
+}
+
 // Tap tempo: taps further apart than this start a new count, and only the
 // most recent taps are averaged so the tempo follows the player.
 const TAP_RESET_MS = 2000
@@ -34,7 +54,16 @@ function tempoLabel(bpm: number): string {
 export function MetronomeView() {
   const { bpm, swing, setBpm, setSwing } = useGlobalTempo()
   const [clicking, setClicking] = useState(false)
-  const [accent24, setAccent24] = useState(true)
+  const [meter, setMeter] = useState<Meter>('binary')
+  // Each meter remembers its own accent choice, so switching back and forth
+  // restores what the player had picked.
+  const [accentByMeter, setAccentByMeter] = useState<Record<Meter, string>>({
+    binary: '24',
+    ternary: '1',
+  })
+  const beatsPerBar = METERS.find((m) => m.id === meter)!.beats
+  const accentOptions = ACCENTS[meter]
+  const accent = accentOptions.find((a) => a.id === accentByMeter[meter])!
   const [currentBeat, setCurrentBeat] = useState(0)
   const [beatTick, setBeatTick] = useState(0)
   const metronomeRef = useRef<Metronome | null>(null)
@@ -66,8 +95,9 @@ export function MetronomeView() {
     metronomeRef.current?.setSwing(swing)
   }, [swing])
   useEffect(() => {
-    metronomeRef.current?.setAccentBeats(accent24 ? [2, 4] : [1])
-  }, [accent24])
+    metronomeRef.current?.setBeatsPerBar(beatsPerBar)
+    metronomeRef.current?.setAccentBeats(accent.beats)
+  }, [beatsPerBar, accent])
 
   async function toggleClick() {
     const m = metronomeRef.current
@@ -110,7 +140,7 @@ export function MetronomeView() {
     'border-border text-text-muted active:border-accent active:text-white inline-flex size-[clamp(2.5rem,7.2cqh,3rem)] shrink-0 items-center justify-center rounded-xl border text-xl transition-colors'
 
   return (
-    <div className="flex flex-1 flex-col gap-[clamp(0.5rem,2.6cqh,1.75rem)]">
+    <div className="flex flex-1 flex-col gap-[clamp(0.5rem,2.4cqh,1.75rem)]">
       {/* Tempo readout */}
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(0.25rem,1.2cqh,0.5rem)]">
         <span className="text-text-muted text-[11px] tracking-[0.35em]" style={mono}>
@@ -132,7 +162,7 @@ export function MetronomeView() {
             style={{
               ...display,
               fontVariationSettings: '"opsz" 144, "wght" 600, "SOFT" 30',
-              fontSize: 'clamp(3.5rem, 15cqh, 7.5rem)',
+              fontSize: 'clamp(3.25rem, 13cqh, 7.5rem)',
               letterSpacing: '-0.03em',
             }}
           >
@@ -144,9 +174,9 @@ export function MetronomeView() {
         </span>
         {/* Beat dots */}
         <div className="mt-[clamp(0.5rem,1.9cqh,1rem)] flex justify-center gap-3">
-          {[1, 2, 3, 4].map((b) => {
+          {Array.from({ length: beatsPerBar }, (_, i) => i + 1).map((b) => {
             const isCurrent = clicking && currentBeat === b
-            const isAccent = accent24 ? b === 2 || b === 4 : b === 1
+            const isAccent = accent.beats.includes(b)
             return (
               <div
                 key={b}
@@ -245,33 +275,28 @@ export function MetronomeView() {
           className="accent-[var(--color-accent)]"
           aria-label="Swing"
         />
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-text-muted text-[11px] tracking-[0.3em]" style={mono}>
-            ACCENT
-          </span>
-          <div
-            role="radiogroup"
-            aria-label="Accented beats"
-            className="border-border flex rounded-lg border p-0.5 text-[11px] tracking-[0.15em]"
-            style={mono}
-          >
-            {[
-              { on24: false, label: '1' },
-              { on24: true, label: '2 & 4' },
-            ].map((o) => (
-              <button
-                key={o.label}
-                type="button"
-                role="radio"
-                aria-checked={accent24 === o.on24}
-                onClick={() => setAccent24(o.on24)}
-                className={`rounded-md px-3 py-1.5 transition-colors ${
-                  accent24 === o.on24 ? 'bg-accent/15 text-white' : 'text-text-muted'
-                }`}
-              >
-                {o.label}
-              </button>
-            ))}
+        <div className="flex items-end justify-between gap-3">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-text-muted text-[11px] tracking-[0.3em]" style={mono}>
+              METER
+            </span>
+            <Segmented
+              label="Meter"
+              options={METERS}
+              value={meter}
+              onChange={(id) => setMeter(id as Meter)}
+            />
+          </div>
+          <div className="flex flex-col items-end gap-1.5">
+            <span className="text-text-muted text-[11px] tracking-[0.3em]" style={mono}>
+              ACCENT
+            </span>
+            <Segmented
+              label="Accented beats"
+              options={accentOptions}
+              value={accent.id}
+              onChange={(id) => setAccentByMeter((prev) => ({ ...prev, [meter]: id }))}
+            />
           </div>
         </div>
       </div>
@@ -297,6 +322,42 @@ export function MetronomeView() {
           </>
         )}
       </button>
+    </div>
+  )
+}
+
+function Segmented({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string
+  options: { id: string; label: string }[]
+  value: string
+  onChange: (id: string) => void
+}) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className="border-border flex rounded-lg border p-0.5 text-[11px] tracking-[0.1em]"
+      style={mono}
+    >
+      {options.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          role="radio"
+          aria-checked={value === o.id}
+          onClick={() => onChange(o.id)}
+          className={`whitespace-nowrap rounded-md px-2.5 py-1.5 transition-colors ${
+            value === o.id ? 'bg-accent/15 text-white' : 'text-text-muted'
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
     </div>
   )
 }
