@@ -1,4 +1,4 @@
-# Woodshed Tools
+# Woodshed Metronome
 
 Metronome and tuner, pulled out of Woodshed as a standalone iOS app.
 

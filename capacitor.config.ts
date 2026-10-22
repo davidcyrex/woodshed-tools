@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'io.davidrosario.woodshedtools',
-  appName: 'Woodshed Tools',
+  appName: 'Woodshed Metronome',
   webDir: 'dist',
   backgroundColor: '#0e0f14',
   ios: {

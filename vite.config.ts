@@ -46,8 +46,8 @@ export default defineConfig(({ mode }) => {
               registerType: 'autoUpdate',
               includeAssets: ['apple-touch-icon.png', 'icon.svg'],
               manifest: {
-                name: 'Woodshed Tools',
-                short_name: 'Woodshed',
+                name: 'Woodshed Metronome',
+                short_name: 'Woodshed Metronome',
                 description: 'Metronome and tuner.',
                 theme_color: '#0e0f14',
                 background_color: '#0e0f14',
