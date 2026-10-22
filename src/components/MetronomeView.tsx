@@ -15,6 +15,11 @@ const TEMPO_PRESETS: { bpm: number; label: string }[] = [
   { bpm: 180, label: 'Presto' },
 ]
 
+// Tap tempo: taps further apart than this start a new count, and only the
+// most recent taps are averaged so the tempo follows the player.
+const TAP_RESET_MS = 2000
+const TAP_WINDOW = 6
+
 function tempoLabel(bpm: number): string {
   if (bpm < 60) return 'Larghissimo'
   if (bpm < 76) return 'Largo'
@@ -33,6 +38,9 @@ export function MetronomeView() {
   const [currentBeat, setCurrentBeat] = useState(0)
   const [beatTick, setBeatTick] = useState(0)
   const metronomeRef = useRef<Metronome | null>(null)
+  const tapTimesRef = useRef<number[]>([])
+  const tapResetRef = useRef<number | undefined>(undefined)
+  const [tapCount, setTapCount] = useState(0)
 
   // Metronome lifecycle. Disposing on unmount also stops the click when the
   // user switches to the tuner.
@@ -77,6 +85,27 @@ export function MetronomeView() {
     }
   }
 
+  function tap() {
+    const now = performance.now()
+    const prev = tapTimesRef.current
+    const times = prev.length && now - prev[prev.length - 1]! > TAP_RESET_MS ? [] : prev
+    times.push(now)
+    if (times.length > TAP_WINDOW) times.shift()
+    tapTimesRef.current = times
+    setTapCount(times.length)
+    if (times.length >= 2) {
+      const avgMs = (times[times.length - 1]! - times[0]!) / (times.length - 1)
+      setBpm(Math.max(40, Math.min(280, 60000 / avgMs)))
+    }
+    window.clearTimeout(tapResetRef.current)
+    tapResetRef.current = window.setTimeout(() => {
+      tapTimesRef.current = []
+      setTapCount(0)
+    }, TAP_RESET_MS)
+  }
+
+  useEffect(() => () => window.clearTimeout(tapResetRef.current), [])
+
   const stepBtn =
     'border-border text-text-muted active:border-accent active:text-white inline-flex size-[clamp(2.5rem,7.2cqh,3rem)] shrink-0 items-center justify-center rounded-xl border text-xl transition-colors'
 
@@ -85,20 +114,31 @@ export function MetronomeView() {
       {/* Tempo readout */}
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(0.25rem,1.2cqh,0.5rem)]">
         <span className="text-text-muted text-[11px] tracking-[0.35em]" style={mono}>
-          {tempoLabel(bpm).toUpperCase()}
+          {tapCount === 1 ? 'KEEP TAPPING' : tempoLabel(bpm).toUpperCase()}
         </span>
-        <span
-          key={clicking ? beatTick : 'idle'}
-          className={`tabular-nums leading-none text-white ${clicking ? 'beat-pop' : ''}`}
-          style={{
-            ...display,
-            fontVariationSettings: '"opsz" 144, "wght" 600, "SOFT" 30',
-            fontSize: 'clamp(3.5rem, 15cqh, 7.5rem)',
-            letterSpacing: '-0.03em',
-          }}
+        {/* Tap the number in time to set the tempo. pointerdown, not click,
+            so the tap registers on touch, not on release. */}
+        <button
+          type="button"
+          onPointerDown={tap}
+          aria-label={`Tempo ${bpm} BPM. Tap repeatedly to set the tempo.`}
+          className="touch-manipulation rounded-2xl px-4"
         >
-          {bpm}
-        </span>
+          <span
+            key={clicking ? beatTick : `tap-${tapCount}`}
+            className={`block tabular-nums leading-none text-white ${
+              clicking || tapCount > 0 ? 'beat-pop' : ''
+            }`}
+            style={{
+              ...display,
+              fontVariationSettings: '"opsz" 144, "wght" 600, "SOFT" 30',
+              fontSize: 'clamp(3.5rem, 15cqh, 7.5rem)',
+              letterSpacing: '-0.03em',
+            }}
+          >
+            {bpm}
+          </span>
+        </button>
         <span className="text-text-muted text-[11px] tracking-[0.35em]" style={mono}>
           BPM
         </span>
