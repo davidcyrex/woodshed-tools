@@ -30,8 +30,13 @@ export default function App() {
       </nav>
 
       {/* Each view owns its audio and tears it down on unmount, so switching
-          tabs stops the click / releases the mic. */}
-      <main className="flex min-h-0 flex-1 flex-col overflow-hidden pt-[clamp(1rem,3dvh,1.5rem)] pb-[clamp(0.25rem,1dvh,0.75rem)]">
+          tabs stops the click / releases the mic. The views size themselves in
+          cqh, so they scale to the height actually left between the tab bar
+          and the home indicator, not the full screen. */}
+      <main
+        style={{ containerType: 'size' }}
+        className="flex min-h-0 flex-1 flex-col overflow-hidden pt-[clamp(1rem,3dvh,1.5rem)] pb-[clamp(0.25rem,1dvh,0.75rem)]"
+      >
         {tab === 'metronome' ? <MetronomeView /> : <TunerView />}
       </main>
     </div>

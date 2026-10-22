@@ -78,12 +78,12 @@ export function MetronomeView() {
   }
 
   const stepBtn =
-    'border-border text-text-muted active:border-accent active:text-white inline-flex size-[clamp(2.5rem,6dvh,3rem)] shrink-0 items-center justify-center rounded-xl border text-xl transition-colors'
+    'border-border text-text-muted active:border-accent active:text-white inline-flex size-[clamp(2.5rem,7.2cqh,3rem)] shrink-0 items-center justify-center rounded-xl border text-xl transition-colors'
 
   return (
-    <div className="flex flex-1 flex-col gap-[clamp(0.75rem,2.6dvh,1.75rem)]">
+    <div className="flex flex-1 flex-col gap-[clamp(0.5rem,2.6cqh,1.75rem)]">
       {/* Tempo readout */}
-      <div className="flex flex-1 flex-col items-center justify-center gap-[clamp(0.25rem,1dvh,0.5rem)]">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(0.25rem,1.2cqh,0.5rem)]">
         <span className="text-text-muted text-[11px] tracking-[0.35em]" style={mono}>
           {tempoLabel(bpm).toUpperCase()}
         </span>
@@ -93,7 +93,7 @@ export function MetronomeView() {
           style={{
             ...display,
             fontVariationSettings: '"opsz" 144, "wght" 600, "SOFT" 30',
-            fontSize: 'clamp(4.25rem, 14dvh, 7.5rem)',
+            fontSize: 'clamp(3.5rem, 15cqh, 7.5rem)',
             letterSpacing: '-0.03em',
           }}
         >
@@ -103,7 +103,7 @@ export function MetronomeView() {
           BPM
         </span>
         {/* Beat dots */}
-        <div className="mt-[clamp(0.5rem,1.6dvh,1rem)] flex justify-center gap-3">
+        <div className="mt-[clamp(0.5rem,1.9cqh,1rem)] flex justify-center gap-3">
           {[1, 2, 3, 4].map((b) => {
             const isCurrent = clicking && currentBeat === b
             const isAccent = accent24 ? b === 2 || b === 4 : b === 1
@@ -161,7 +161,7 @@ export function MetronomeView() {
             type="button"
             onClick={() => setBpm(p.bpm)}
             aria-pressed={bpm === p.bpm}
-            className={`flex flex-col items-center gap-0.5 rounded-xl border px-2 py-[clamp(0.375rem,1.3dvh,0.75rem)] transition-colors ${
+            className={`flex flex-col items-center gap-0.5 rounded-xl border px-2 py-[clamp(0.375rem,1.6cqh,0.75rem)] transition-colors ${
               bpm === p.bpm
                 ? 'bg-accent/15 border-accent text-white'
                 : 'border-border text-text-muted active:border-accent active:text-white'
@@ -174,7 +174,7 @@ export function MetronomeView() {
       </div>
 
       {/* Swing + accent */}
-      <div className="border-border flex flex-col gap-[clamp(0.5rem,1.6dvh,1rem)] border-t pt-[clamp(0.75rem,2.2dvh,1.25rem)]">
+      <div className="border-border flex flex-col gap-[clamp(0.5rem,1.9cqh,1rem)] border-t pt-[clamp(0.75rem,2.6cqh,1.25rem)]">
         <div className="flex items-baseline justify-between gap-2">
           <span className="text-text-muted text-[11px] tracking-[0.3em]" style={mono}>
             SWING
@@ -240,7 +240,7 @@ export function MetronomeView() {
       <button
         type="button"
         onClick={() => void toggleClick()}
-        className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl py-[clamp(0.875rem,2.4dvh,1.25rem)] text-sm tracking-[0.3em] transition-colors ${
+        className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl py-[clamp(0.875rem,2.9cqh,1.25rem)] text-sm tracking-[0.3em] transition-colors ${
           clicking
             ? 'bg-red-500/80 text-white active:bg-red-500'
             : 'bg-accent active:bg-accent-hover text-black'
