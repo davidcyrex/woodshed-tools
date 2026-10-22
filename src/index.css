@@ -29,10 +29,13 @@ body,
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Native shell: no rubber-band scroll, no long-press callouts or text
+/* The layout always fits one screen, so the page never scrolls. Pinning the
+ * body also stops iOS rubber-banding and the scroll-edge blur iOS draws under
+ * the status bar when the page is scrollable. No long-press callouts or text
  * selection on controls. */
 html,
 body {
+  overflow: hidden;
   overscroll-behavior: none;
   -webkit-user-select: none;
   user-select: none;
@@ -41,6 +44,11 @@ body {
 }
 
 /* Keep content clear of the notch, status bar and home indicator. */
+body {
+  position: fixed;
+  inset: 0;
+}
+
 #root {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);

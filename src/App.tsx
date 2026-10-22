@@ -31,7 +31,7 @@ export default function App() {
 
       {/* Each view owns its audio and tears it down on unmount, so switching
           tabs stops the click / releases the mic. */}
-      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto py-[clamp(1rem,3dvh,1.5rem)]">
+      <main className="flex min-h-0 flex-1 flex-col overflow-hidden py-[clamp(1rem,3dvh,1.5rem)]">
         {tab === 'metronome' ? <MetronomeView /> : <TunerView />}
       </main>
     </div>
