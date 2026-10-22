@@ -12,7 +12,7 @@ export default function App() {
   return (
     <div className="mx-auto flex h-full w-full max-w-xl flex-col px-5">
       <nav
-        className="border-border bg-surface/40 mt-[clamp(0.5rem,1.5dvh,1rem)] grid grid-cols-2 rounded-2xl border p-1"
+        className="border-border bg-surface/40 mt-[clamp(1.25rem,3dvh,1.75rem)] grid grid-cols-2 rounded-2xl border p-1"
         style={mono}
       >
         <TabButton
@@ -31,7 +31,7 @@ export default function App() {
 
       {/* Each view owns its audio and tears it down on unmount, so switching
           tabs stops the click / releases the mic. */}
-      <main className="flex min-h-0 flex-1 flex-col overflow-hidden py-[clamp(1rem,3dvh,1.5rem)]">
+      <main className="flex min-h-0 flex-1 flex-col overflow-hidden pt-[clamp(1rem,3dvh,1.5rem)] pb-[clamp(0.25rem,1dvh,0.75rem)]">
         {tab === 'metronome' ? <MetronomeView /> : <TunerView />}
       </main>
     </div>
