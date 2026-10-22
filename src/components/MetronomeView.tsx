@@ -78,12 +78,12 @@ export function MetronomeView() {
   }
 
   const stepBtn =
-    'border-border text-text-muted active:border-accent active:text-white inline-flex size-12 shrink-0 items-center justify-center rounded-xl border text-xl transition-colors'
+    'border-border text-text-muted active:border-accent active:text-white inline-flex size-[clamp(2.5rem,6dvh,3rem)] shrink-0 items-center justify-center rounded-xl border text-xl transition-colors'
 
   return (
-    <div className="flex flex-1 flex-col gap-7">
+    <div className="flex flex-1 flex-col gap-[clamp(0.75rem,2.6dvh,1.75rem)]">
       {/* Tempo readout */}
-      <div className="flex flex-col items-center gap-2 pt-2">
+      <div className="flex flex-1 flex-col items-center justify-center gap-[clamp(0.25rem,1dvh,0.5rem)]">
         <span className="text-text-muted text-[11px] tracking-[0.35em]" style={mono}>
           {tempoLabel(bpm).toUpperCase()}
         </span>
@@ -93,7 +93,7 @@ export function MetronomeView() {
           style={{
             ...display,
             fontVariationSettings: '"opsz" 144, "wght" 600, "SOFT" 30',
-            fontSize: '6.5rem',
+            fontSize: 'clamp(4.25rem, 14dvh, 7.5rem)',
             letterSpacing: '-0.03em',
           }}
         >
@@ -102,26 +102,25 @@ export function MetronomeView() {
         <span className="text-text-muted text-[11px] tracking-[0.35em]" style={mono}>
           BPM
         </span>
-      </div>
-
-      {/* Beat dots */}
-      <div className="flex justify-center gap-3">
-        {[1, 2, 3, 4].map((b) => {
-          const isCurrent = clicking && currentBeat === b
-          const isAccent = accent24 ? b === 2 || b === 4 : b === 1
-          return (
-            <div
-              key={b}
-              className={`size-3.5 rounded-full transition-colors ${
-                isCurrent
-                  ? 'bg-accent'
-                  : isAccent
-                    ? 'border-accent bg-bg border'
-                    : 'bg-bg border-border border'
-              }`}
-            />
-          )
-        })}
+        {/* Beat dots */}
+        <div className="mt-[clamp(0.5rem,1.6dvh,1rem)] flex justify-center gap-3">
+          {[1, 2, 3, 4].map((b) => {
+            const isCurrent = clicking && currentBeat === b
+            const isAccent = accent24 ? b === 2 || b === 4 : b === 1
+            return (
+              <div
+                key={b}
+                className={`size-3.5 rounded-full transition-colors ${
+                  isCurrent
+                    ? 'bg-accent'
+                    : isAccent
+                      ? 'border-accent bg-bg border'
+                      : 'bg-bg border-border border'
+                }`}
+              />
+            )
+          })}
+        </div>
       </div>
 
       {/* Tempo controls */}
@@ -162,7 +161,7 @@ export function MetronomeView() {
             type="button"
             onClick={() => setBpm(p.bpm)}
             aria-pressed={bpm === p.bpm}
-            className={`flex flex-col items-center gap-0.5 rounded-xl border px-2 py-2.5 transition-colors ${
+            className={`flex flex-col items-center gap-0.5 rounded-xl border px-2 py-[clamp(0.375rem,1.3dvh,0.75rem)] transition-colors ${
               bpm === p.bpm
                 ? 'bg-accent/15 border-accent text-white'
                 : 'border-border text-text-muted active:border-accent active:text-white'
@@ -175,7 +174,7 @@ export function MetronomeView() {
       </div>
 
       {/* Swing + accent */}
-      <div className="border-border flex flex-col gap-3 border-t pt-5">
+      <div className="border-border flex flex-col gap-[clamp(0.5rem,1.6dvh,1rem)] border-t pt-[clamp(0.75rem,2.2dvh,1.25rem)]">
         <div className="flex items-baseline justify-between gap-2">
           <span className="text-text-muted text-[11px] tracking-[0.3em]" style={mono}>
             SWING
@@ -206,27 +205,42 @@ export function MetronomeView() {
           className="accent-[var(--color-accent)]"
           aria-label="Swing"
         />
-        <label
-          className={`mt-2 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-[11px] tracking-[0.25em] transition-colors ${
-            accent24 ? 'bg-accent/15 border-accent text-white' : 'border-border text-text-muted'
-          }`}
-          style={mono}
-        >
-          <input
-            type="checkbox"
-            checked={accent24}
-            onChange={(e) => setAccent24(e.target.checked)}
-            className="size-3.5 accent-[var(--color-accent)]"
-          />
-          ACCENT 2 &amp; 4
-        </label>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-text-muted text-[11px] tracking-[0.3em]" style={mono}>
+            ACCENT
+          </span>
+          <div
+            role="radiogroup"
+            aria-label="Accented beats"
+            className="border-border flex rounded-lg border p-0.5 text-[11px] tracking-[0.15em]"
+            style={mono}
+          >
+            {[
+              { on24: false, label: '1' },
+              { on24: true, label: '2 & 4' },
+            ].map((o) => (
+              <button
+                key={o.label}
+                type="button"
+                role="radio"
+                aria-checked={accent24 === o.on24}
+                onClick={() => setAccent24(o.on24)}
+                className={`rounded-md px-3 py-1.5 transition-colors ${
+                  accent24 === o.on24 ? 'bg-accent/15 text-white' : 'text-text-muted'
+                }`}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Start / stop */}
       <button
         type="button"
         onClick={() => void toggleClick()}
-        className={`mt-auto inline-flex w-full items-center justify-center gap-2 rounded-2xl py-5 text-sm tracking-[0.3em] transition-colors ${
+        className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl py-[clamp(0.875rem,2.4dvh,1.25rem)] text-sm tracking-[0.3em] transition-colors ${
           clicking
             ? 'bg-red-500/80 text-white active:bg-red-500'
             : 'bg-accent active:bg-accent-hover text-black'

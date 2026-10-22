@@ -75,7 +75,7 @@ export function TunerView() {
   }
 
   return (
-    <div className="flex flex-1 flex-col justify-center gap-10">
+    <div className="flex flex-1 flex-col justify-center gap-[clamp(1.5rem,5dvh,2.5rem)]">
       <div className="flex items-baseline justify-center gap-3">
         <span
           className={`tabular-nums leading-none transition-colors ${
@@ -84,7 +84,7 @@ export function TunerView() {
           style={{
             ...display,
             fontVariationSettings: '"opsz" 144, "wght" 600, "SOFT" 30',
-            fontSize: '8rem',
+            fontSize: 'clamp(5.5rem, 18dvh, 9rem)',
             letterSpacing: '-0.03em',
           }}
         >
